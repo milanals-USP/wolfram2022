@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head><h2>Conexão API Componentes Simétricas<h2></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+     
+        <!--<img src="Circuito 1.png" alt="Circuito 1" width="500" height="500">-->
+
+	VA &nbsp <input type="number" id="valor_VAabs" name="valor"
+       min="0" max="1000" value="130.37">&nbsp V &nbsp &angle; <input type="number" id="valor_VAang" name="valor"
+       min="0" max="1000" value="34.8"> &deg <br><br>
+	VB &nbsp <input type="number" id="valor_VBabs" name="valor"
+       min="0" max="1000" value="78.57">&nbsp V &nbsp &angle; <input type="number" id="valor_VBang" name="valor"
+       min="0" max="1000" value="142.8"> &deg <br><br>
+	VC &nbsp <input type="number" id="valor_VCabs" name="valor"
+       min="0" max="1000" value="56.83">&nbsp V &nbsp &angle; <input type="number" id="valor_VCang" name="valor"
+       min="0" max="1000" value="36.8"> &deg <br><br>
+        <input type="button" id="envia" value="Enviar valores">
+	<br><br>
+	V0 &nbsp <input type="number" id="valor_V0abs" name="valor"
+       min="0" max="1000" value="">&nbsp V &nbsp &angle; <input type="number" id="valor_V0ang" name="valor"
+       min="0" max="1000" value=""> &deg <br><br>
+	V1 &nbsp <input type="number" id="valor_V1abs" name="valor"
+       min="0" max="1000" value="">&nbsp V &nbsp &angle; <input type="number" id="valor_V1ang" name="valor"
+       min="0" max="1000" value=""> &deg <br><br>
+	V2 &nbsp <input type="number" id="valor_V2abs" name="valor"
+       min="0" max="1000" value="">&nbsp V &nbsp &angle; <input type="number" id="valor_V2ang" name="valor"
+       min="0" max="1000" value=""> &deg <br><br>
+	
+
+	<span id="solucoes"></span>
+
+    </body>
+
+
+     <script type="text/javascript" async="async">
+/* 
+JavaScript EmbedCode usage:
+
+var wcc = new WolframCloudCall();
+wcc.call(arg01, function(result) { console.log(result); });
+*/
+ 
+var WolframCloudCall;
+
+(function() {
+WolframCloudCall = function() {	this.init(); };
+
+var p = WolframCloudCall.prototype;
+
+p.init = function() {};
+
+p._createCORSRequest = function(method, url) {
+	var xhr = new XMLHttpRequest();
+	if ("withCredentials" in xhr) {
+		xhr.open(method, url, true);
+	} else if (typeof XDomainRequest != "undefined") {
+		xhr = new XDomainRequest();
+		xhr.open(method, url);
+	} else {
+		xhr = null;
+	}
+	return xhr;
+};
+
+p._encodeArgs = function(args) {
+	var argName;
+	var params = "";
+	for (argName in args) {
+		params += (params == "" ? "" : "&");
+		params += encodeURIComponent(argName) + "=" + encodeURIComponent(args[argName]);
+	}
+	return params;
+};
+
+p._auxCall = function(url, args, callback) {
+	var params = this._encodeArgs(args);
+	var xhr = this._createCORSRequest("post", url);
+	if (xhr) {
+		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		//xhr.setRequestHeader("EmbedCode-User-Agent", "EmbedCode-JavaScript/1.0");
+		xhr.onload = function() {
+			if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+				callback(xhr.responseText);
+			} else {
+				callback(null);
+			}
+		};
+		xhr.send(params);
+	} else {
+		throw new Error("Could not create request object.");
+	}
+};
+
+
+p.call = function(arg01, callback) {
+	var url = "https://www.wolframcloud.com/obj/milanals/2022/calculaCS";
+	var args = {arg01: arg01};
+	var callbackWrapper = function(result) {
+		if (result === null) callback(null);
+		else callback(result);
+	};
+	this._auxCall(url, args, callbackWrapper);
+};
+})();
+//Wolfram termina aqui
+
+document.getElementById('envia').addEventListener("click",chamaApi);
+
+//https://riptutorial.com/html5-canvas/example/11659/detecting-mouse-position-on-the-canvas
+
+function chamaApi(){
+    var wcc = new WolframCloudCall();
+    var valor;
+	var json_result;
+    
+    valor_VAabs=document.getElementById('valor_VAabs').value;
+    valor_VAabs=parseFloat(valor_VAabs);
+	valor_VAang=document.getElementById('valor_VAang').value;
+    valor_VAang=parseFloat(valor_VAang);
+	
+	valor_VBabs=document.getElementById('valor_VBabs').value;
+    valor_VBabs=parseFloat(valor_VBabs);
+	valor_VBang=document.getElementById('valor_VBang').value;
+    valor_VBang=parseFloat(valor_VBang);
+	
+	valor_VCabs=document.getElementById('valor_VCabs').value;
+    valor_VCabs=parseFloat(valor_VCabs);
+	valor_VCang=document.getElementById('valor_VCang').value;
+    valor_VCang=parseFloat(valor_VCang);
+
+  
+    arg01={arg01:{circuito:"1",VAabs:valor_VAabs,VAang:valor_VAang, VBabs:valor_VBabs,VBang:valor_VBang, VCabs:valor_VCabs,VCang:valor_VCang}};
+    arg01=JSON.stringify(arg01);
+    wcc.call(arg01, function(result) { 
+		json_result=JSON.parse(JSON.parse(result))
+		x = document.getElementById("valor_V0abs");
+		x.value=json_result.V0abs;
+		x = document.getElementById("valor_V0ang");
+		x.value=json_result.V0ang;
+		
+		x = document.getElementById("valor_V1abs");
+		x.value=json_result.V1abs;
+		x = document.getElementById("valor_V1ang");
+		x.value=json_result.V1ang;
+		
+		x = document.getElementById("valor_V2abs");
+		x.value=json_result.V2abs;
+		x = document.getElementById("valor_V2ang");
+		x.value=json_result.V2ang;
+
+
+    }
+	            );
+
+}
+
+        </script>
+        
+        </html>
